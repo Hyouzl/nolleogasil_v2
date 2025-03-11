@@ -1,0 +1,9 @@
+#.gradle
+# build
+src/main/resources/application.properties
+*.md
+*.log
+.dockerignore
+.git
+.gitignore
+erl_crash.dump
