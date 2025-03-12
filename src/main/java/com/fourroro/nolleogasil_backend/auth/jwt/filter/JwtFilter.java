@@ -45,7 +45,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         String requestURI = request.getRequestURI();
-
+        String token =  null;
+        String jwt = null;
         // /api/users/refresh 요청은 JWT 검증을 건너뜀
         if (requestURI.equals("/api/users/refresh")) {
             System.out.println("refresh 요청");
@@ -58,14 +59,14 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
         log.debug("Received request: {} {}", request.getMethod(), request.getRequestURI());
-        if (requestURI.startsWith("/ws/info")) { // 🔹 정확한 비교를 위해 startsWith 사용
+        if (requestURI.startsWith("/ws")) { // 🔹 정확한 비교를 위해 startsWith 사용
             System.out.println("웹소켓 접속 요청");
 
             log.debug("Received request: {} {}", request.getMethod(), request.getRequestURI());
             log.debug("Query String: {}", request.getQueryString()); // 🔹 쿼리 스트링 확인
             log.debug("Full URL: {}", request.getRequestURL()); // 🔹 전체 URL 확인
 
-            String token = request.getParameter("token"); // WebSocket URL 쿼리 파라미터로 JWT 전달
+            token = request.getParameter("token"); // WebSocket URL 쿼리 파라미터로 JWT 전달
             System.out.println("token: " + token);
 
             if (token == null || token.isEmpty()) {
@@ -74,22 +75,29 @@ public class JwtFilter extends OncePerRequestFilter {
                 log.debug("Extracted token: {}", token);
             }
 
+
+
             filterChain.doFilter(request, response);
             return;
         }
 
 
         // 1. Request Header 에서 토큰을 꺼냄
-        String jwt = resolveToken(request);
-        System.out.println("JwtToke" + jwt);
-        if (jwt == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            return;
+        if (token == null) {
+            jwt = resolveToken(request);
+            System.out.println("JwtToken : " + jwt);
+            if (jwt == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                return;
+            }
         }
 
         try {
 
+            if (token != null) {
+                jwt = token;
+            }
             // 2. validateToken 으로 토큰 유효성 검사
             // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
             if (StringUtils.hasText(jwt)) {
