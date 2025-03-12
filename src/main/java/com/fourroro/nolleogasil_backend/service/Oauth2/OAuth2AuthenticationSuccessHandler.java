@@ -58,7 +58,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String makeRedirectUrl(String accessToken, Long userId) {
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect")
+        return UriComponentsBuilder.fromUriString("https://www.nolleogasil.shop/oauth2/redirect")
                 .queryParam("accessToken", accessToken)
                 .queryParam("userId", userId)
                 .build().toUriString();
