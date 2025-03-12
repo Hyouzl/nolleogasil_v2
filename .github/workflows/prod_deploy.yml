@@ -78,6 +78,7 @@ jobs:
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             # `deploy.sh` 실행 시 ALB 관련 환경 변수 전달
             export ALB_LISTENER_ARN=${{ secrets.ALB_LISTENER_ARN }}
+            export BLUE_TARGET_GROUP_ARN=${{ secrets.BLUE_TARGET_GROUP_ARN }}
             export GREEN_TARGET_GROUP_ARN=${{ secrets.GREEN_TARGET_GROUP_ARN }}
 
             # Blue/Green 배포 스크립트 실행
