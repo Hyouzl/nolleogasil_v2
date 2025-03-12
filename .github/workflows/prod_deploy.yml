@@ -67,7 +67,7 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ubuntu/app
+            cd /home/ubuntu/data
             
           
             # 최신 Docker 이미지 Pull
