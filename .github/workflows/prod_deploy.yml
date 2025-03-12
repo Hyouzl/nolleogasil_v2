@@ -68,12 +68,18 @@ jobs:
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/app
+            
             # 최신 버전의 application.yml 적용
             echo "${{ secrets.APPLICATION_YML }}" > application.yml
           
             # 최신 Docker 이미지 Pull
             docker pull ${{ env.DOCKER_IMAGE }} 
-            
+          
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            # `deploy.sh` 실행 시 ALB 관련 환경 변수 전달
+            export ALB_LISTENER_ARN=${{ secrets.ALB_LISTENER_ARN }}
+            export GREEN_TARGET_GROUP_ARN=${{ secrets.GREEN_TARGET_GROUP_ARN }}
+
             # Blue/Green 배포 스크립트 실행
             chmod +x deploy.sh
             ./deploy.sh
