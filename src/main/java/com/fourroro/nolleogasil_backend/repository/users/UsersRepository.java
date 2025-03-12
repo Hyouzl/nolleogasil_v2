@@ -38,6 +38,8 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     public Optional<Users> findByEmail(String email);
 
+    public Optional<Users> findByLoginId(String loginId);
+
     @Query(value = "SELECT u.nickname FROM Users u WHERE u.email = :email")
     public String findNickname(@Param("email")String email);
 

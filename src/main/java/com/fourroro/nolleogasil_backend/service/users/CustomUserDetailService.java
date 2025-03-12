@@ -14,11 +14,20 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailService implements UserDetailsService {
     private final UsersRepository userRepository;
 
+
     @Override
-    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
+        Users users = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with loginId: " + loginId));
+
+        return new PrincipalDetails(users);
+    }
+    public UserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
         Users user = userRepository.findByUsersId(Long.valueOf(userId))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
 
         return new PrincipalDetails(user);
     }
+
+
 }

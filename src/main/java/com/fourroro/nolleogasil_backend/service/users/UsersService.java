@@ -1,9 +1,11 @@
 package com.fourroro.nolleogasil_backend.service.users;
 
+import com.fourroro.nolleogasil_backend.dto.users.LoginDTO;
 import com.fourroro.nolleogasil_backend.dto.users.UsersDto;
 import com.fourroro.nolleogasil_backend.entity.users.Users;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 이 인터페이스는 회원 정보 관리를 위한 Service Interface입니다.
@@ -13,7 +15,7 @@ import java.util.List;
  */
 public interface UsersService {
 
-    public void insertUsers(UsersDto users);
+    public Users insertUsers(LoginDTO.RequestRegisterDTO users);
     //public Users findByusersId(Long usersId);
 
     public Users findByUsersId(Long usersId);
@@ -37,7 +39,10 @@ public interface UsersService {
     public void deleteUsers(Long usersId);
 
     Users findUsersByEmail(String email);
+    Users findByLoginId(String loginId);
 
     /** 사용자의 mateTemp 값 변경 */
     public void setMateTemp(Long usersId, Float mateTemp);
+
+
 }

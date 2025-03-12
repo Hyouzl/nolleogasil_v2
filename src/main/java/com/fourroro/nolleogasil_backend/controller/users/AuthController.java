@@ -34,6 +34,7 @@ public class AuthController {
         // Redis에서 리프레시 토큰 삭제 (로그아웃 처리)
         String refreshTokenKey = "refreshToken" + userId;
         redisTemplate.delete(refreshTokenKey);
+
         System.out.println("refreshTokenKey" + refreshTokenKey + "로그아웃 처리");
 
         // 액세스 토큰을 블랙리스트에 추가하여 더 이상 사용되지 않도록 설정
