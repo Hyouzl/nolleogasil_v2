@@ -82,6 +82,6 @@ jobs:
             export GREEN_TARGET_GROUP_ARN=${{ secrets.GREEN_TARGET_GROUP_ARN }}
 
             # Blue/Green 배포 스크립트 실행
-            chmod +x deploy.sh
+            sudo chmod u+x deploy.sh
             ./deploy.sh
           EOF
