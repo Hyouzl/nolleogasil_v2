@@ -75,7 +75,7 @@ jobs:
             # 최신 Docker 이미지 Pull
             docker pull ${{ env.DOCKER_IMAGE }} 
           
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export DOCKER_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             # `deploy.sh` 실행 시 ALB 관련 환경 변수 전달
             export ALB_LISTENER_ARN=${{ secrets.ALB_LISTENER_ARN }}
             export BLUE_TARGET_GROUP_ARN=${{ secrets.BLUE_TARGET_GROUP_ARN }}
