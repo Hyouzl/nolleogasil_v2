@@ -83,7 +83,7 @@ public class UsersController {
 
     @PostMapping("/login")
     public ApiResponse<TokenDTO.ResponseTokenDTO> commonLogin(@RequestBody LoginDTO.RequestLoginDTO loginRequest) {
-        try {
+
             Users existingUsers = usersService.findByLoginId(loginRequest.getLoginId());
             System.out.println(existingUsers.getUsersId());
             TokenDTO.ResponseTokenDTO responseTokenDTO = null;
@@ -92,14 +92,6 @@ public class UsersController {
                 responseTokenDTO = authService.login(loginRequest);
             }
             return ApiResponse.onSuccess(responseTokenDTO);
-        } catch (BadCredentialsException e) {
-            return ApiResponse.onFailure(ErrorStatus._UNAUTHORIZED.getCode(), "아이디 또는 비밀번호가 일치하지 않습니다.", null);
-        } catch (Exception e) {
-            return ApiResponse.onFailure(ErrorStatus._INTERNAL_SERVER_ERROR.getCode(), ErrorStatus._INTERNAL_SERVER_ERROR.getMessage(), null);
-        }
-
-
-
     }
 
     @PostMapping("/register")

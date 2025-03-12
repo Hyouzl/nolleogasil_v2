@@ -1,5 +1,7 @@
 package com.fourroro.nolleogasil_backend.service.users;
 
+import com.fourroro.nolleogasil_backend.apiPayLoad.Exception.UsersException;
+import com.fourroro.nolleogasil_backend.apiPayLoad.code.status.ErrorStatus;
 import com.fourroro.nolleogasil_backend.auth.jwt.JwtTokenResponseDto;
 import com.fourroro.nolleogasil_backend.auth.jwt.util.TokenProvider;
 import com.fourroro.nolleogasil_backend.dto.users.LoginDTO;
@@ -8,6 +10,7 @@ import com.fourroro.nolleogasil_backend.entity.users.PrincipalDetails;
 import com.fourroro.nolleogasil_backend.entity.users.RefreshToken;
 import com.fourroro.nolleogasil_backend.repository.users.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -28,10 +31,10 @@ public class AuthServiceImpl implements AuthService{
         // 1. Login Id/PW 를 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginId, password);
 
+        try {
         // 2. 실제 검증 (사용자 비밀번호 체크)
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
         // 3. 인증 정보를 기반으로 JWT 생성
         JwtTokenResponseDto tokenDto = tokenProvider.generateTokenDto(authentication, "COMMON");
 
@@ -50,5 +53,8 @@ public class AuthServiceImpl implements AuthService{
                 .userId(refreshToken.getUserId())
                 .nickname(principalDetails.getNickname())
                 .build();
+        } catch (BadCredentialsException e) {
+            throw new UsersException(ErrorStatus._UNAUTHORIZED);
+        }
     }
 }
