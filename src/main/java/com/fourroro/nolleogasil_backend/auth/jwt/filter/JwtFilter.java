@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  * 이 인증 정보를 SecurityContextHolder에 저장하여 이후 보안 검사가 가능하도록 합니다.
  * **/
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -55,14 +57,27 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (requestURI.equals("/ws/**")) {
+        log.debug("Received request: {} {}", request.getMethod(), request.getRequestURI());
+        if (requestURI.startsWith("/ws/info")) { // 🔹 정확한 비교를 위해 startsWith 사용
             System.out.println("웹소켓 접속 요청");
-            String token = request.getParameter("token"); // ✅ WebSocket URL 쿼리 파라미터로 JWT 전달
 
+            log.debug("Received request: {} {}", request.getMethod(), request.getRequestURI());
+            log.debug("Query String: {}", request.getQueryString()); // 🔹 쿼리 스트링 확인
+            log.debug("Full URL: {}", request.getRequestURL()); // 🔹 전체 URL 확인
+
+            String token = request.getParameter("token"); // WebSocket URL 쿼리 파라미터로 JWT 전달
             System.out.println("token: " + token);
+
+            if (token == null || token.isEmpty()) {
+                log.warn("토큰이 없습니다. WebSocket 인증 실패");
+            } else {
+                log.debug("Extracted token: {}", token);
+            }
+
             filterChain.doFilter(request, response);
             return;
         }
+
 
         // 1. Request Header 에서 토큰을 꺼냄
         String jwt = resolveToken(request);
