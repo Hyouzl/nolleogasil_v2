@@ -2,7 +2,13 @@ name: nolleogasil backend 배포 자동화
 
 on:
   push:
-    branches: [main]  # main 브랜치에 푸시되면 실행
+    branches: 
+      - main  # ✅ main 브랜치에서만 실행
+    
+  pull_request:
+    branches-ignore:
+      - '**'  # ✅ 모든 브랜치에서 PR 관련 이벤트 무시 (PR이 열리거나 머지될 때 실행되지 않음)
+
 
 jobs:
   build:
