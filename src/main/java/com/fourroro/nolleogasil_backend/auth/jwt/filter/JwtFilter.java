@@ -55,6 +55,15 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        if (requestURI.equals("/ws/**")) {
+            System.out.println("웹소켓 접속 요청");
+            String token = request.getParameter("token"); // ✅ WebSocket URL 쿼리 파라미터로 JWT 전달
+
+            System.out.println("token: " + token);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 1. Request Header 에서 토큰을 꺼냄
         String jwt = resolveToken(request);
         System.out.println("JwtToke" + jwt);
