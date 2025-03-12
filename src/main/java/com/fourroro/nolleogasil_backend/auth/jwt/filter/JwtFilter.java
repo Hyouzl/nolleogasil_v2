@@ -1,9 +1,6 @@
 package com.fourroro.nolleogasil_backend.auth.jwt.filter;
 
-import com.fourroro.nolleogasil_backend.apiPayLoad.ApiResponse;
 import com.fourroro.nolleogasil_backend.apiPayLoad.Exception.InvalidJWTException;
-import com.fourroro.nolleogasil_backend.apiPayLoad.Exception.UsersException;
-import com.fourroro.nolleogasil_backend.apiPayLoad.code.status.ErrorStatus;
 import com.fourroro.nolleogasil_backend.auth.jwt.util.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

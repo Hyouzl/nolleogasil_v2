@@ -32,7 +32,6 @@ public class AuthServiceImpl implements AuthService{
         // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-
         // 3. 인증 정보를 기반으로 JWT 생성
         JwtTokenResponseDto tokenDto = tokenProvider.generateTokenDto(authentication, "COMMON");
 
