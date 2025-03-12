@@ -12,17 +12,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
-    public void deleteByEmail(String userId) {
-        refreshTokenRepository.deleteByEmail(userId);
+    public void deleteByUserId(Long userId) {
+        refreshTokenRepository.deleteByUserId(userId);
     }
 
     @Override
-    public void saveToken(String email, String refreshToken) {
-        refreshTokenRepository.findByEmail(email)
+    public void saveToken(Long userId, String refreshToken) {
+        refreshTokenRepository.findByUserId(userId)
                 .ifPresentOrElse(
                         existingToken -> existingToken.updateToken(refreshToken),
                         () -> refreshTokenRepository.save(RefreshToken.builder()
-                                .email(email)
+                                .userId(userId)
                                 .token(refreshToken)
                                 .build())
                 );

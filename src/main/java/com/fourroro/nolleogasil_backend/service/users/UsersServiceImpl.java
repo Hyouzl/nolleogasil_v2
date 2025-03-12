@@ -1,11 +1,15 @@
 package com.fourroro.nolleogasil_backend.service.users;
 
+import com.fourroro.nolleogasil_backend.apiPayLoad.Exception.UsersException;
+import com.fourroro.nolleogasil_backend.apiPayLoad.code.status.ErrorStatus;
+import com.fourroro.nolleogasil_backend.dto.users.LoginDTO;
 import com.fourroro.nolleogasil_backend.dto.users.UsersDto;
 import com.fourroro.nolleogasil_backend.entity.users.Users;
 import com.fourroro.nolleogasil_backend.global.exception.GlobalException;
 import com.fourroro.nolleogasil_backend.global.exception.ResultCode;
 import com.fourroro.nolleogasil_backend.repository.users.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +29,13 @@ import static com.fourroro.nolleogasil_backend.dto.users.UsersDto.changeToDto;
 @RequiredArgsConstructor
 public class UsersServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public void insertUsers(UsersDto usersDto) {
+    public Users insertUsers(LoginDTO.RequestRegisterDTO usersDto) {
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(usersDto.getPassword());
         //성별 한글로 변환
         if(usersDto.getGender().equals("female")){
             usersDto.setGender("여성");
@@ -38,8 +45,13 @@ public class UsersServiceImpl implements UsersService {
             usersDto.setGender("성별 미상");
         }
 
+        usersDto.setPassword(encodedPassword);
         Users users = Users.changeToEntity(usersDto);
-        usersRepository.save(users);
+
+
+        return usersRepository.save(users);
+
+
     }
 
     @Override
@@ -84,6 +96,7 @@ public class UsersServiceImpl implements UsersService {
     public Users findByPhone(String phone) {
         return usersRepository.findByPhone(phone).orElseThrow(()->new GlobalException(ResultCode.NOT_FOUND_USER));
     }
+/*
 
     public boolean validateDuplicateUsers(UsersDto usersDto) throws IllegalAccessException {
         Users users = Users.changeToEntity(usersDto);
@@ -110,6 +123,7 @@ public class UsersServiceImpl implements UsersService {
         }
         return false; // 업데이트 실패 또는 사용자가 존재하지 않음
     }
+*/
 
     @Override
     @Transactional
@@ -128,6 +142,13 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public Users findUsersByEmail(String email) {
         return usersRepository.findUsersByEmail(email);
+    }
+
+    @Override
+    public Users findByLoginId(String loginId) {
+        Users users = usersRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new UsersException(ErrorStatus.MEMBER_NOT_FOUND));
+        return users;
     }
 
     /** 사용자의 mateTemp 값 변경 */

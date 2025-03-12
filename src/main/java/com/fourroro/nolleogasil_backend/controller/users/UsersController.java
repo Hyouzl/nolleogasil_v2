@@ -1,14 +1,20 @@
 package com.fourroro.nolleogasil_backend.controller.users;
 
+import com.fourroro.nolleogasil_backend.apiPayLoad.ApiResponse;
 import com.fourroro.nolleogasil_backend.auth.jwt.util.TokenProvider;
 import com.fourroro.nolleogasil_backend.dto.users.KakaoDto;
+import com.fourroro.nolleogasil_backend.dto.users.LoginDTO;
+import com.fourroro.nolleogasil_backend.dto.users.TokenDTO;
 import com.fourroro.nolleogasil_backend.dto.users.UsersDto;
 import com.fourroro.nolleogasil_backend.entity.users.Users;
+import com.fourroro.nolleogasil_backend.service.users.AuthService;
+import com.fourroro.nolleogasil_backend.service.users.UsersService;
 import com.fourroro.nolleogasil_backend.service.users.UsersServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,82 +32,78 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UsersController {
-    private final UsersServiceImpl usersService;
+    private final UsersService usersService;
     private final TokenProvider tokenProvider;
+    private final AuthService authService;
 
     //회원가입 및 로그인
-    @PostMapping("/profile")
-    public ResponseEntity<Long> setUserProfile(HttpSession session, @RequestBody KakaoDto kakaoRequest){
-        try{
-            //카카오로부터 받은 사용자 정보 中 phone_number
-            String kakaoUsersPhone = kakaoRequest.getPhone();
-            String kakaoUsersEmail = kakaoRequest.getEmail();
-            //기존 회원 여부 확인
-            boolean isDuplicate = usersService.validateDuplicateUsers(kakaoRequest.toDto());
+    /**
+     @PostMapping("/profile")
+     public ResponseEntity<Long> setUserProfile(HttpSession session, @RequestBody KakaoDto kakaoRequest){
+     try{
+     //카카오로부터 받은 사용자 정보 中 phone_number
+     String kakaoUsersPhone = kakaoRequest.getPhone();
+     String kakaoUsersEmail = kakaoRequest.getEmail();
+     //기존 회원 여부 확인
+     boolean isDuplicate = usersService.validateDuplicateUsers(kakaoRequest.toDto());
 
-            if(isDuplicate) { //기존 회원인 경우
-                Users existingUsers = usersService.findByEmail(kakaoUsersEmail);
-                String existingPhone = existingUsers.getPhone();
+     if(isDuplicate) { //기존 회원인 경우
+     Users existingUsers = usersService.findByEmail(kakaoUsersEmail);
+     String existingPhone = existingUsers.getPhone();
 
-                //전화번호가 변경되었으면
-                if(!existingPhone.equals(kakaoUsersPhone)){
-                    usersService.validateDuplicatePhoneAndUpdate(kakaoUsersEmail, kakaoUsersPhone);
-                }
+     //전화번호가 변경되었으면
+     if(!existingPhone.equals(kakaoUsersPhone)){
+     usersService.validateDuplicatePhoneAndUpdate(kakaoUsersEmail, kakaoUsersPhone);
+     }
 
-                UsersDto usersDto = UsersDto.changeToDto(existingUsers);
+     UsersDto usersDto = UsersDto.changeToDto(existingUsers);
 
-                //세션에 사용자 정보 저장
-                session.setAttribute("users", usersDto);
+     //세션에 사용자 정보 저장
+     session.setAttribute("users", usersDto);
 
-                //프론트엔드로 기존 회원임을 전달
-                return ResponseEntity.ok().body(usersDto.getUsersId());
-            }else { //신규 회원인 경우
-                usersService.insertUsers(kakaoRequest.toDto());
-                Users users = usersService.findByEmail(kakaoRequest.getEmail());
-                UsersDto usersDto = UsersDto.changeToDto(users);
+     //프론트엔드로 기존 회원임을 전달
+     return ResponseEntity.ok().body(usersDto.getUsersId());
+     }else { //신규 회원인 경우
+     usersService.insertUsers(kakaoRequest.toDto());
+     Users users = usersService.findByEmail(kakaoRequest.getEmail());
+     UsersDto usersDto = UsersDto.changeToDto(users);
 
-                //세션에 사용자 정보 저장
-                session.setAttribute("users", usersDto);
+     //세션에 사용자 정보 저장
+     session.setAttribute("users", usersDto);
 
-                //프론트엔드로 신규 회원임을 전달
-                return ResponseEntity.status(HttpStatus.CREATED).body(-1L);
-            }
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(-1L);
-        }
-    }
+     //프론트엔드로 신규 회원임을 전달
+     return ResponseEntity.status(HttpStatus.CREATED).body(-1L);
+     }
+     }catch(Exception e){
+     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(-1L);
+     }
+     } **/
 
     @PostMapping("/login")
-    public ResponseEntity<Long> commonLogin(HttpSession session, @RequestParam("email") String email){
-        try{
-            Users existingUsers = usersService.findUsersByEmail(email);
+    public ApiResponse<TokenDTO.ResponseTokenDTO> commonLogin(@RequestBody LoginDTO.RequestLoginDTO loginRequest) {
 
+            Users existingUsers = usersService.findByLoginId(loginRequest.getLoginId());
+            System.out.println(existingUsers.getUsersId());
+            TokenDTO.ResponseTokenDTO responseTokenDTO=null;
             if(existingUsers != null){ //기존 회원
-                UsersDto usersDto = UsersDto.changeToDto(existingUsers);
-                session.setAttribute("users", usersDto);
+                responseTokenDTO = authService.login(loginRequest);
 
-                return ResponseEntity.ok().body(usersDto.getUsersId());
-            }else{ //신규 회원
-                return ResponseEntity.status(HttpStatus.CREATED).body(-1L); // 201 Created로 회원가입 신호
+
             }
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(-1L);
-        }
+        return ApiResponse.onSuccess(responseTokenDTO);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Long> commonRegister(HttpSession session, @RequestBody UsersDto registeredUser){
+    public ResponseEntity<UsersDto> commonRegister(@RequestBody LoginDTO.RequestRegisterDTO registeredUser){
         try{
-            usersService.insertUsers(registeredUser);
-            Users users = usersService.findUsersByEmail(registeredUser.getEmail());
-            UsersDto usersDto = UsersDto.changeToDto(users);
-            //세션에 사용자 정보 저장
-            session.setAttribute("users", usersDto);
+            Users users = usersService.insertUsers(registeredUser);
+            UsersDto usersDto = UsersDto.changeToUsersDTO(users);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(usersDto.getUsersId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(usersDto);
+
         }catch(Exception e){
             //예외 발생 시 BAD_REQUEST와 함께 -1L 반환
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -114,7 +116,7 @@ public class UsersController {
 */
 
     @GetMapping("/info")
-    public ResponseEntity<UsersDto> getUserInfo(@RequestParam Long usersId){
+    public ResponseEntity<UsersDto> getUserInfo(@RequestParam("usersId") Long usersId) {
         try {
             Users users = usersService.findByUsersId(usersId);
             UsersDto usersDto = UsersDto.changeToDto(users);

@@ -32,7 +32,7 @@ public class ChatDto {
     public static class ResponseChatDTO {
         private Long chatId;
         private Long chatroomId;
-        private Long usersId;
+        private Long userId;
         private String nickname;
         private String message;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
@@ -41,7 +41,7 @@ public class ChatDto {
         public static ResponseChatDTO toChatDto(Chat chat) {
             return ResponseChatDTO.builder()
                     .chatId(chat.getChatId())
-                    .usersId(chat.getUsers().getUsersId())
+                    .userId(chat.getUsers().getUsersId())
                     .chatroomId(chat.getChatRoom().getChatroomId())
                     .message(chat.getMessage())
                     .sendDate(chat.getSendDate())

@@ -1,10 +1,7 @@
 package com.fourroro.nolleogasil_backend.dto.users;
 
 import com.fourroro.nolleogasil_backend.entity.users.Users;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.io.Serializable;
@@ -16,12 +13,19 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UsersDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotNull
     private Long usersId;
+    @NotNull
+    private String loginId;
+    @NotNull
+    private String password;
+
     @NotNull
     private String name;
     @NotNull
@@ -60,4 +64,18 @@ public class UsersDto implements Serializable {
                 .mateTemp(entity.getMatetemp())
                 .build();
     }
+
+    public static UsersDto changeToUsersDTO (Users users) {
+        return UsersDto.builder()
+                .usersId(users.getUsersId())
+                .loginId(users.getLoginId())
+                .password(users.getPassword())
+                .name(users.getName())
+                .email(users.getEmail())
+                .nickname(users.getNickname())
+                .phone(users.getPhone())
+                .mateTemp(users.getMatetemp())
+                .build();
+    }
+
 }

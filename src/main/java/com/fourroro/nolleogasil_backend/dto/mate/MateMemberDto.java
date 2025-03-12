@@ -17,6 +17,7 @@ public class MateMemberDto {
 
     private Long matememberId;      //PK //member의 id
     private Long usersId;           //mate 참가자의 usersId
+    private String nickname;
     private MateDto mate;           //해당 mate 공고 글
     private Long chatroomID;        //해당 mate의 채팅방 id
     private int isFirst;            //채팅방에 처음 입장인지(처음입장이라면 1, 아니면 0)
@@ -26,6 +27,7 @@ public class MateMemberDto {
     public static MateMemberDto changeToDto(MateMember entity) {
         return MateMemberDto.builder()
                 .matememberId(entity.getMatememberId())
+                .nickname(entity.getUsers().getNickname())
                 .usersId(entity.getUsers().getUsersId())
                 .mate(MateDto.changeToDto(entity.getMate()))
                 .chatroomID(entity.getChatRoom().getChatroomId())

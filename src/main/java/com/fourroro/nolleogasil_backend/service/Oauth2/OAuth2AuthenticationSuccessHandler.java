@@ -46,7 +46,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         response.addCookie(cookie); **/
 
         //  Refresh Token을 레디스에 저장
-       String key = "refreshToken" + oAuth2User.getUserId();
+        String key = "refreshToken" + oAuth2User.getUserId();
         long expiration = 7 * 24 * 60 * 60; // 7일 (초 단위)
         redisTemplate.opsForValue().set(key, jwtTokenResponseDto.getRefreshToken(), expiration, TimeUnit.SECONDS);
 

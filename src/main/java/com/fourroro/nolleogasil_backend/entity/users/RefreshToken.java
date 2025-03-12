@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
     @Id
-    private String email;
+    private Long userId;
 
     @Column(nullable = false)
     private String token;

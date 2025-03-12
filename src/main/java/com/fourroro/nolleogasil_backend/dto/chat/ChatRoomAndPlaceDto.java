@@ -19,6 +19,7 @@ import java.time.LocalDate;
 public class ChatRoomAndPlaceDto {
 
     private Long chatroomId;
+    private Long mateId;
     private String roomName;
     private Long usersId; //개설자
     private String nickname;
@@ -31,6 +32,7 @@ public class ChatRoomAndPlaceDto {
     public static ChatRoomAndPlaceDto ChangeToDto(ChatRoom chatRoom, PlaceDto placeDto, MateDto mateDto, int memberCnt) {
         return ChatRoomAndPlaceDto.builder()
                 .chatroomId(chatRoom.getChatroomId())
+                .mateId(mateDto.getMateId())
                 .roomName(chatRoom.getRoomName())
                 .usersId(chatRoom.getUsers().getUsersId())
                 .maxNum(chatRoom.getMaxNum())
@@ -43,6 +45,7 @@ public class ChatRoomAndPlaceDto {
     public static ChatRoomAndPlaceDto createDto(ChatRoomDto chatRoomDto, PlaceDto placeDto, MateDto mateDto) {
         return ChatRoomAndPlaceDto.builder()
                 .chatroomId(chatRoomDto.getChatroomId())
+                .mateId(mateDto.getMateId())
                 .roomName(chatRoomDto.getRoomName())
                 .usersId(chatRoomDto.getUsersId())
                 .maxNum(chatRoomDto.getMaxNum())

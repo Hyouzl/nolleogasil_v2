@@ -57,7 +57,7 @@ public class TokenProvider {
 
     public Authentication getAuthenticationFromUserId(String userId) {
         // userId를 기반으로 PrincipalDetails 가져오기
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+        UserDetails userDetails = userDetailsService.loadUserByUserId(userId);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
@@ -96,7 +96,7 @@ public class TokenProvider {
                 .setExpiration(refreshExprTime)
                 .compact();
 
-        refreshTokenService.saveToken(String.valueOf(principalDetails.getUserId()), refreshToken);
+        refreshTokenService.saveToken(principalDetails.getUserId(), refreshToken);
 
 
 

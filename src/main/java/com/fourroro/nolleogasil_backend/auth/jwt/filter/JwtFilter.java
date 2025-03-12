@@ -50,7 +50,11 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
+        if (requestURI.equals("/api/user/login")) {
+            System.out.println("로그인요청");
+            filterChain.doFilter(request, response);
+            return;
+        }
         // 1. Request Header 에서 토큰을 꺼냄
         String jwt = resolveToken(request);
         System.out.println("JwtToke" + jwt);

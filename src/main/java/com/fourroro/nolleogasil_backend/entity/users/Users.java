@@ -1,6 +1,7 @@
 package com.fourroro.nolleogasil_backend.entity.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fourroro.nolleogasil_backend.dto.users.LoginDTO;
 import com.fourroro.nolleogasil_backend.dto.users.UsersDto;
 import com.fourroro.nolleogasil_backend.entity.chat.Chat;
 import com.fourroro.nolleogasil_backend.entity.chat.ChatRoom;
@@ -30,6 +31,8 @@ public class Users implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long usersId;
+
+    private String loginId;
 
     private String name;
 
@@ -100,15 +103,17 @@ public class Users implements Serializable {
         this.role = role;
     }
 
-    public static Users changeToEntity(UsersDto dto) {
+    public static Users changeToEntity(LoginDTO.RequestRegisterDTO dto) {
         return Users.builder()
-                .usersId(dto.getUsersId())
+                .loginId(dto.getLoginId())
+                .password(dto.getPassword())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .phone(dto.getPhone())
                 .gender(dto.getGender())
-                .matetemp(dto.getMateTemp())
+                .matetemp(36.5F)
+                .role(Role.ROLE_USER)
                 .build();
     }
 
