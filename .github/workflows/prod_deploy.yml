@@ -68,38 +68,13 @@ jobs:
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ubuntu/app
-
-            # 현재 활성 컨테이너 확인 (Blue/Green)
-            CURRENT=$(docker ps --filter "name=backend-" --format "{{.Names}}")
-
-            if [ "$CURRENT" = "backend-blue" ]; then
-              NEW_CONTAINER="backend-green"
-              OLD_CONTAINER="backend-blue"
-            else
-              NEW_CONTAINER="backend-blue"
-              OLD_CONTAINER="backend-green"
-            fi
-
-            echo "🔵🟢 현재 실행 중인 컨테이너: $CURRENT"
-            echo "➡️ 새 컨테이너: $NEW_CONTAINER"
-
-            # 새로운 컨테이너 실행
-            docker pull ${{ env.DOCKER_IMAGE }}
-            docker run -d --name $NEW_CONTAINER -p 8080:8080 --restart always ${{ env.DOCKER_IMAGE }}
-
-            # Health Check 대기 (5초)
-            sleep 5
-
-            # ALB의 Target Group 변경
-            aws elbv2 modify-listener \
-                --listener-arn ${{ secrets.ALB_LISTENER_ARN }} \
-                --default-actions Type=forward,TargetGroupArn=${{ secrets.GREEN_TARGET_GROUP_ARN }}
-
-            echo "✅ ALB Target Group이 $NEW_CONTAINER로 변경됨"
-
-            # 이전 컨테이너 종료 및 삭제
-            docker stop $OLD_CONTAINER
-            docker rm $OLD_CONTAINER
-
-            echo "✅ Blue/Green 배포 완료! 현재 실행 중인 컨테이너: $NEW_CONTAINER"
+            # 최신 버전의 application.yml 적용
+            echo "${{ secrets.APPLICATION_YML }}" > application.yml
+          
+            # 최신 Docker 이미지 Pull
+            docker pull ${{ env.DOCKER_IMAGE }} 
+            
+            # Blue/Green 배포 스크립트 실행
+            chmod +x deploy.sh
+            ./deploy.sh
           EOF
