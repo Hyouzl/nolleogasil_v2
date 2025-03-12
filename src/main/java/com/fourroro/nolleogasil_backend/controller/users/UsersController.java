@@ -1,6 +1,7 @@
 package com.fourroro.nolleogasil_backend.controller.users;
 
 import com.fourroro.nolleogasil_backend.apiPayLoad.ApiResponse;
+import com.fourroro.nolleogasil_backend.apiPayLoad.code.status.ErrorStatus;
 import com.fourroro.nolleogasil_backend.auth.jwt.util.TokenProvider;
 import com.fourroro.nolleogasil_backend.dto.users.KakaoDto;
 import com.fourroro.nolleogasil_backend.dto.users.LoginDTO;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -81,16 +83,23 @@ public class UsersController {
 
     @PostMapping("/login")
     public ApiResponse<TokenDTO.ResponseTokenDTO> commonLogin(@RequestBody LoginDTO.RequestLoginDTO loginRequest) {
-
+        try {
             Users existingUsers = usersService.findByLoginId(loginRequest.getLoginId());
             System.out.println(existingUsers.getUsersId());
-            TokenDTO.ResponseTokenDTO responseTokenDTO=null;
+            TokenDTO.ResponseTokenDTO responseTokenDTO = null;
+
             if(existingUsers != null){ //기존 회원
                 responseTokenDTO = authService.login(loginRequest);
-
-
             }
-        return ApiResponse.onSuccess(responseTokenDTO);
+            return ApiResponse.onSuccess(responseTokenDTO);
+        } catch (BadCredentialsException e) {
+            return ApiResponse.onFailure(ErrorStatus._UNAUTHORIZED.getCode(), "아이디 또는 비밀번호가 일치하지 않습니다.", null);
+        } catch (Exception e) {
+            return ApiResponse.onFailure(ErrorStatus._INTERNAL_SERVER_ERROR.getCode(), ErrorStatus._INTERNAL_SERVER_ERROR.getMessage(), null);
+        }
+
+
+
     }
 
     @PostMapping("/register")
